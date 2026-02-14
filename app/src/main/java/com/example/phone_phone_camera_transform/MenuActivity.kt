@@ -1,4 +1,3 @@
-// 【重点修改】这里改成了你实际的包名
 package com.example.phone_phone_camera_transform
 
 import android.content.Intent
@@ -11,7 +10,6 @@ class MenuActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_menu)
 
-        // 这里的 R.id.btnModeCamera 如果爆红，请尝试 Rebuild Project
         findViewById<Button>(R.id.btnModeCamera).setOnClickListener {
             startActivity(Intent(this, CameraActivity::class.java))
         }
