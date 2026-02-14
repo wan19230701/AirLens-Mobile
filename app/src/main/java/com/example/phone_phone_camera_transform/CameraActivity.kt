@@ -1,4 +1,4 @@
-package com.example.phone_phone_camera_transform // 【保持你的包名】
+package com.example.phone_phone_camera_transform 
 
 import android.Manifest
 import android.app.PictureInPictureParams
@@ -129,7 +129,7 @@ class CameraActivity : AppCompatActivity() {
         startCamera()
     }
 
-    // --- 1. 视频发送 ---
+    // 1. 视频发送
     private fun startVideoServer() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
@@ -166,7 +166,7 @@ class CameraActivity : AppCompatActivity() {
         }.start()
     }
 
-    // --- 2. 音频发送 ---
+    // 2. 音频发送
     private fun startAudioServer() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
@@ -197,7 +197,7 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
-    // --- 3. 喊话接收 ---
+    // 3. 喊话接收
     private fun startTalkServer() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
@@ -231,7 +231,7 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
-    // --- 4. 摄像头核心 ---
+    // 4. 摄像头核心
     private fun startCamera() {
         val providerFuture = ProcessCameraProvider.getInstance(this)
         providerFuture.addListener({
@@ -243,7 +243,7 @@ class CameraActivity : AppCompatActivity() {
     private fun bindCamera() {
         val provider = cameraProvider ?: return
         val selector = CameraSelector.Builder().requireLensFacing(lensFacing).build()
-        // 使用 640x480 分辨率，兼容性最好，传输最流畅
+        // 使用 640x480 分辨率
         val strategy = ResolutionStrategy(Size(640, 480), ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER)
 
         imageAnalysis = ImageAnalysis.Builder()
@@ -255,7 +255,6 @@ class CameraActivity : AppCompatActivity() {
         imageAnalysis?.setAnalyzer(cameraExecutor) { image ->
             try {
                 if (isStreaming && videoOutputStream != null) {
-                    // 使用增强版转换函数，解决绿屏问题
                     val nv21Bytes = yuv420ToNv21(image)
 
                     val yuvImage = YuvImage(nv21Bytes, ImageFormat.NV21, image.width, image.height, null)
@@ -280,7 +279,7 @@ class CameraActivity : AppCompatActivity() {
         try { provider.unbindAll(); camera = provider.bindToLifecycle(this, selector, imageAnalysis) } catch (e: Exception) {}
     }
 
-    // --- 【终极兼容算法】YUV_420_888 转 NV21 ---
+    // YUV_420_888 转 NV21
     // 这个函数能够完美处理荣耀/华为等手机的内存对齐问题
     private fun yuv420ToNv21(image: ImageProxy): ByteArray {
         val width = image.width
@@ -315,13 +314,10 @@ class CameraActivity : AppCompatActivity() {
         }
 
         // 2. 复制 UV 分量 (处理 PixelStride 和 RowStride)
-        // NV21 格式是 V, U, V, U...
         val uvHeight = height / 2
         val uvWidth = width / 2
         var pos = ySize
 
-        // 这种双重循环虽然看起来慢，但对于 640x480 的图像，现代 CPU 处理只需几毫秒
-        // 它是保证兼容性的唯一方法
         for (row in 0 until uvHeight) {
             for (col in 0 until uvWidth) {
                 val uvPos = row * rowStrideUV + col * pixelStrideUV
@@ -330,7 +326,7 @@ class CameraActivity : AppCompatActivity() {
                 if (uvPos < vBuffer.limit()) {
                     nv21[pos++] = vBuffer.get(uvPos)
                 } else {
-                    pos++ // 容错，防止数组越界
+                    pos++ 
                 }
 
                 // 提取 U
