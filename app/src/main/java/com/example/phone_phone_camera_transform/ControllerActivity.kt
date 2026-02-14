@@ -39,7 +39,7 @@ class ControllerActivity : AppCompatActivity() {
     private var videoSocket: Socket? = null
     private var commandOut: DataOutputStream? = null
 
-    // --- 【修改点1】 记录旋转状态 ---
+    // 记录旋转状态
     private var currentRotation = 90f // 默认后置竖屏是90度
     private var isFrontCamera = false // 记录当前是不是前置
 
@@ -59,7 +59,7 @@ class ControllerActivity : AppCompatActivity() {
 
         btnConnect.setOnClickListener { if (!isConnected) connect() else disconnect() }
 
-        // --- 【修改点2】 切换镜头时自动旋转 ---
+        // 切换镜头时自动旋转
         btnSwitch.setOnClickListener {
             sendCmd("SWITCH_CAMERA")
             isFrontCamera = !isFrontCamera
